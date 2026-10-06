@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+enum ROLE {
+  Admin
+  Employee
+  Manager
+}
+enum STATUS {
+  APPLICATION_RECEIVED
+  INTERVIEW_SCHEDULED
+  HIRED
+  NOT_ACCEPTED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name String
+  email     String   @unique
+  role  ROLE @default(Employee)
+  password    String
+}
+model Company {
+  id          Int          @id @default(autoincrement())
+  name        String
+  departments Department[]
+}
+model Department{
+  id        Int      @id @default(autoincrement())
+  name String
+  companyId Int
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employees Employee[]
+  @@index([companyId])
+}
+model Employee{
+  id        Int      @id @default(autoincrement())
+  name String
+  email String @unique 
+  mobile String
+  address String
+  departmentId Int
+  status STATUS
+  hiredOn DateTime?  @default(now()) 
+  designation String
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  @@index([departmentId])
+}
