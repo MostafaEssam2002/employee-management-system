@@ -1,9 +1,10 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import * as bcrypt from 'bcrypt'
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { ROLE } from 'src/generated/prisma/enums';
 @Injectable()
 export class AuthService {
   constructor(private prisma:PrismaService,  private jwtService: JwtService){}
@@ -33,18 +34,29 @@ export class AuthService {
     };
   }
   async register(createUserDto: CreateUserDto) {
-    const fetchedUser = await this.prisma.user.findUnique({where:{email:createUserDto.email},select:{email:true}})
-    if(fetchedUser){
-      throw new ConflictException('Email already exists')
+    const data = { ...createUserDto };
+    const fetchedUser = await this.prisma.user.findUnique({
+      where: {
+        email: data.email,
+      },
+      select: {
+        email: true,
+      },
+    });
+    if (fetchedUser) {
+      throw new ConflictException('Email already exists');
     }
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    createUserDto.password = hashedPassword
+    if (data.role !== ROLE.Employee) {
+      throw new BadRequestException('Invalid role for registration');
+    }
+    data.password = await bcrypt.hash(data.password, 10);
     const user = await this.prisma.user.create({
-      data:createUserDto
-    })
+      data,
+    });
+    const { password, ...userWithoutPassword } = user;
     return {
-      message:"User created successfully",
-      data:user
+      message: 'User created successfully',
+      data: userWithoutPassword,
     };
   }
 }

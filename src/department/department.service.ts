@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -104,35 +104,45 @@ export class DepartmentService {
   }
 
   async update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
-    this.logger.log("updating user")
-    const dept = await this.prisma.department.findUnique({
-      where :{id:id}
-    })
-    if(!dept){
-      this.logger.warn(`department with ${id} not found`)
-      throw new NotFoundException ('Department not found');
-    }
-    const companyId = Number(updateDepartmentDto.companyId);
-    if(companyId > 0){
-      const company = await this.prisma.company.findUnique({
-        where:{id:companyId}
-      })
-      if(!company){
-        throw new NotFoundException ('Company not found');
-      }
-    }else{
-      throw new NotFoundException ('CompanyId must be number');
-    }
-    const newDept = await this.prisma.department.update({
-      where:{id:id},
-      data:updateDepartmentDto
-    })
-    return {
-      message:"department updated successfully",
-      data:newDept
-    } 
-    // `This action updates a #${id} department`;
+  this.logger.log('updating department');
+
+  const dept = await this.prisma.department.findUnique({
+    where: { id },
+  });
+
+  if (!dept) {
+    this.logger.warn(`department with ${id} not found`);
+    throw new NotFoundException('Department not found');
   }
+
+  if (updateDepartmentDto.companyId !== undefined) {
+    const companyId = Number(updateDepartmentDto.companyId);
+
+    if (!Number.isInteger(companyId) || companyId <= 0) {
+      throw new BadRequestException('CompanyId must be a valid number');
+    }
+
+    const company = await this.prisma.company.findUnique({
+      where: { id: companyId },
+    });
+
+    if (!company) {
+      throw new NotFoundException('Company not found');
+    }
+
+    updateDepartmentDto.companyId = companyId;
+  }
+
+  const newDept = await this.prisma.department.update({
+    where: { id },
+    data: updateDepartmentDto,
+  });
+
+  return {
+    message: 'Department updated successfully',
+    data: newDept,
+  };
+}
 
   async remove(id: number) {
     this.logger.log("deleting department")

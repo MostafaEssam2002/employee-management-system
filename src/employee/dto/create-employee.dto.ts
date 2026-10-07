@@ -1,7 +1,6 @@
-import { IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
+import { IsDate, IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 import { STATUS } from '../../generated/prisma/enums';
-
-export class CreateEmployeeDto {
+import { Type } from 'class-transformer';export class CreateEmployeeDto {
     @IsString()
     @IsNotEmpty()
     name: string;
@@ -26,10 +25,14 @@ export class CreateEmployeeDto {
     status: STATUS;
 
     @IsOptional()
-    @IsDateString()
-    hiredOn?: string;
+    @IsDate()
+    @Type(() => Date)
+    hiredOn?: Date|null;
 
     @IsString()
     @IsNotEmpty()
     designation: string;
+    @IsNotEmpty()
+    @IsInt()
+    companyId:number ;
 }

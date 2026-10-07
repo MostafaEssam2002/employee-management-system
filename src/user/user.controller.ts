@@ -7,19 +7,19 @@ import { AuthService } from './../auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/auth/roles/roles.decorator';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
-
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('Admin')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService,private readonly authService:AuthService ) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+    return this.userService.register(createUserDto);
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('Manager')
+
   findAll(@Query() paginationDto: PaginationDto) {
     return this.userService.findAll(Number(paginationDto.page));
   }
