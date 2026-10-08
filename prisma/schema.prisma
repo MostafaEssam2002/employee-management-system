@@ -45,8 +45,8 @@ model Employee{
   mobile String
   address String
   departmentId Int
-  status STATUS
-  hiredOn DateTime?  @default(now()) 
+  status STATUS @default(APPLICATION_RECEIVED)
+  hiredOn DateTime?   
   designation String
   department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   @@index([departmentId])

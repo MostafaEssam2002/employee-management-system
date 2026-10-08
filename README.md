@@ -57,6 +57,12 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## API documentation
+
+Start the application and open Swagger UI at `http://localhost:3000/api`.
+Protected endpoints use Bearer JWT authentication. Use the **Authorize** button
+and enter the access token returned by `POST /auth/login`.
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.

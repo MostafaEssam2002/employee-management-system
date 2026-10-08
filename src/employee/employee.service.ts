@@ -2,7 +2,8 @@ import { BadRequestException, ConflictException, Injectable, Logger, NotFoundExc
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { STATUS } from '../generated/prisma/enums';
-import { PrismaService } from 'src/prisma/prisma.service';@Injectable()
+import { PrismaService } from 'src/prisma/prisma.service';
+@Injectable()
 export class EmployeeService {
   constructor(private prisma:PrismaService){}
   private readonly logger = new Logger(EmployeeService.name)
@@ -25,36 +26,22 @@ export class EmployeeService {
     }
   }
   async create(createEmployeeDto: CreateEmployeeDto) {
-    this.logger.log("creating employee")
+    this.logger.log('creating employee');
     const { companyId, ...data } = createEmployeeDto;
-    await this.assertDepartmentBelongsToCompany(data.departmentId, companyId);  
-    if (data.status === STATUS.HIRED) {
-      if (!data.hiredOn) {
-        throw new BadRequestException(
-          'hiredOn is required when employee is hired',
-        );
-      }
-      if (data.hiredOn > new Date()) {
-        throw new BadRequestException(
-          'hiredOn cannot be a future date',
-        );
-      }
-    } else {
-      data.hiredOn = null;
-    }
+    await this.assertDepartmentBelongsToCompany(data.departmentId, companyId);
     const existingEmployee = await this.prisma.employee.findUnique({
-      where: {
-        email: data.email,}})
+      where: { email: data.email },
+    });
     if (existingEmployee) {
-      this.logger.warn(`employee with email already exists`);
+      this.logger.warn('employee with email already exists');
       throw new ConflictException('Employee with this email already exists');
     }
     const employee = await this.prisma.employee.create({
-      data:data
-    })
+      data: { ...data, status: STATUS.APPLICATION_RECEIVED, hiredOn: null },
+    });
     return {
-      message:"employee created successfully",
-      data:{employee}
+      message: 'employee created successfully',
+      data: { employee },
     };
   }
 
@@ -148,28 +135,24 @@ export class EmployeeService {
     };
   }
 
-  async update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
+  async update(id: number, updateEmployeeDto: UpdateEmployeeDto){
     this.logger.log('updating employee');
     const { companyId, ...data } = updateEmployeeDto;
-
     const employee = await this.prisma.employee.findUnique({ where: { id } });
     if (!employee) {
       this.logger.warn(`Employee with ${id} not found`);
       throw new NotFoundException('Employee not found');
     }
-
     if (data.departmentId !== undefined || companyId !== undefined) {
       await this.assertDepartmentBelongsToCompany(
         data.departmentId ?? employee.departmentId,
         companyId,
       );
     }
-
     if (data.hiredOn && data.hiredOn > new Date()) {
       this.logger.warn(`Invalid hiredOn date for employee ${id}`);
       throw new BadRequestException('hiredOn cannot be a future date');
     }
-
     const finalStatus = data.status ?? employee.status;
     if (finalStatus !== STATUS.HIRED) {
       data.hiredOn = null;
@@ -181,6 +164,17 @@ export class EmployeeService {
       if (existing) {
         this.logger.warn(`employee with email already exists`);
         throw new ConflictException('Employee with this email already exists');
+      }
+    }
+    const allowedTransitions:Record<STATUS,STATUS[]> = {
+      [STATUS.APPLICATION_RECEIVED ]: [STATUS.INTERVIEW_SCHEDULED,STATUS.NOT_ACCEPTED],
+      [STATUS.INTERVIEW_SCHEDULED]:[STATUS.NOT_ACCEPTED,STATUS.HIRED],
+      [STATUS.HIRED]:[],
+      [STATUS.NOT_ACCEPTED]:[]
+    }
+    if(data.status&&data.status!==employee.status){
+      if(!allowedTransitions[employee.status].includes(data.status)){
+        throw new BadRequestException(`Cannot change status from ${employee.status} to ${data.status}`);
       }
     }
     const newEmp = await this.prisma.employee.update({ where: { id }, data });
