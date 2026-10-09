@@ -1,0 +1,4 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "module": "commonjs", "moduleResolution": "node", "allowJs": true, "isolatedModules": false, "incremental": false, "declaration": false }
+}

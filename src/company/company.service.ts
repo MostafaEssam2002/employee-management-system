@@ -2,76 +2,80 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+
 @Injectable()
 export class CompanyService {
   private readonly logger = new Logger(CompanyService.name);
+
   constructor(private prisma: PrismaService) {}
-  async create(createCompanyDto: CreateCompanyDto,) {
-      this.logger.log("Creating company")
-      const company = await this.prisma.company.create({
-        data:{
-          name:createCompanyDto.name
-        }
-      })
-      return {
-        message:"Company Created Successfully",
-        data:company
-      }
+
+  async create(createCompanyDto: CreateCompanyDto) {
+    this.logger.log('Creating company');
+    const company = await this.prisma.company.create({
+      data: {
+        name: createCompanyDto.name,
+      },
+    });
+    return {
+      message: 'Company Created Successfully',
+      data: company,
+    };
   }
 
   async findAll(page: number, limit: number) {
-      this.logger.log("fetchine companies")
-      const skip = (page - 1) * limit;
-      const [companies, total] = await Promise.all([
-        this.prisma.company.findMany({
-          skip,
-          take: limit,
-          orderBy: { id: 'asc' },
-          select: {
-            id: true,
-            name: true,
-            _count: { select: { departments: true } },
-          },
-        }),
-        this.prisma.company.count(),
-      ]);
-
-      // عدد الموظفين لكل شركة في الصفحة دي، في query واحدة
-      const departments = await this.prisma.department.findMany({
-        where: { companyId: { in: companies.map((c) => c.id) } },
+    this.logger.log(`Fetching companies (page ${page}, limit ${limit})`);
+    const skip = (page - 1) * limit;
+    const [companies, total] = await Promise.all([
+      this.prisma.company.findMany({
+        skip,
+        take: limit,
+        orderBy: { id: 'asc' },
         select: {
-          companyId: true,
-          _count: { select: { employees: true } },
+          id: true,
+          name: true,
+          _count: { select: { departments: true } },
         },
-      });
+      }),
+      this.prisma.company.count(),
+    ]);
 
-      const employeesByCompany = new Map<number, number>();
-      for (const department of departments) {
-        employeesByCompany.set(
-          department.companyId,
-          (employeesByCompany.get(department.companyId) ?? 0) +
-            department._count.employees,
-        );
-      }
-      return {
-        data: companies.map((company) => ({
-          id: company.id,
-          name: company.name,
-          numberOfDepartments: company._count.departments,
-          numberOfEmployees: employeesByCompany.get(company.id) ?? 0,
-        })),
-        message: 'Companies retrieved successfully',
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
-      };
+    // Employees of every company on this page, counted with a single query
+    const departments = await this.prisma.department.findMany({
+      where: { companyId: { in: companies.map((c) => c.id) } },
+      select: {
+        companyId: true,
+        _count: { select: { employees: true } },
+      },
+    });
+
+    const employeesByCompany = new Map<number, number>();
+    for (const department of departments) {
+      employeesByCompany.set(
+        department.companyId,
+        (employeesByCompany.get(department.companyId) ?? 0) +
+          department._count.employees,
+      );
     }
 
+    return {
+      data: companies.map((company) => ({
+        id: company.id,
+        name: company.name,
+        numberOfDepartments: company._count.departments,
+        numberOfEmployees: employeesByCompany.get(company.id) ?? 0,
+      })),
+      message: 'Companies retrieved successfully',
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async findOne(id: number) {
-    this.logger.log(`Fetching company with ID: ${id}`)
+    this.logger.log(`Fetching company with ID: ${id}`);
     const [company, numberOfEmployees] = await Promise.all([
       this.prisma.company.findUnique({
         where: { id },
@@ -101,42 +105,37 @@ export class CompanyService {
   }
 
   async update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    this.logger.log(`Fetching employee with ID: ${id}`)
-      const company = await this.prisma.company.findUnique({
-        where:{id:id}
-      })
-      if(!company){
-        this.logger.warn(`Company with id ${id} not found for update`);
-        throw new NotFoundException('Company not found');
-      }
-      const updatedCompany= await this.prisma.company.update({
-        where:{id:id},
-        data:{
-          name:updateCompanyDto.name
-        }
-      })
-      return {
-          message:"Company updated successfully ",
-          data:updatedCompany
-      }
+    this.logger.log(`Updating company with ID: ${id}`);
+    const company = await this.prisma.company.findUnique({ where: { id } });
+    if (!company) {
+      this.logger.warn(`Company with id ${id} not found for update`);
+      throw new NotFoundException('Company not found');
     }
+    const updatedCompany = await this.prisma.company.update({
+      where: { id },
+      data: {
+        name: updateCompanyDto.name,
+      },
+    });
+    return {
+      message: 'Company updated successfully',
+      data: updatedCompany,
+    };
+  }
 
   async remove(id: number) {
-    this.logger.log(`Fetching employee with ID: ${id}`)
-      const company = await this.prisma.company.findUnique({
-        where:{id:id}
-      })
-      if(!company){
-        this.logger.warn(`Company with id ${id} not found for update`);
-        throw new NotFoundException('Company not found');
-      }
-      const deletedCompany= await this.prisma.company.delete({
-        where:{id:id},
-      })
-      return {
-          message:"Company deleted successfully ",
-          data:deletedCompany
-      }
+    this.logger.log(`Deleting company with ID: ${id}`);
+    const company = await this.prisma.company.findUnique({ where: { id } });
+    if (!company) {
+      this.logger.warn(`Company with id ${id} not found for deletion`);
+      throw new NotFoundException('Company not found');
+    }
+    // Its departments and their employees are removed by the database (ON DELETE CASCADE)
+    const deletedCompany = await this.prisma.company.delete({ where: { id } });
+    return {
+      message: 'Company deleted successfully',
+      data: deletedCompany,
+    };
   }
 }
   // async findOne(id: number) {
