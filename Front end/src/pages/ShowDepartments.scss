@@ -1,0 +1,134 @@
+// Full-page cream background + mint strip on the left (overrides the narrow #root from index.css)
+body:has(.departments) {
+    background: #f8f1e3;
+}
+
+#root:has(.departments) {
+    width: 100%;
+    border-inline: 0;
+    text-align: left;
+}
+
+.departments {
+    --primary: #134e4a;
+    --primary-light: #e6f3ef;
+    --accent: #2f8f7b;
+    --card-bg: #ffffff;
+    --border: #e4e7e6;
+    --text: #1f2d2b;
+    --muted: #6f8a85;
+    --danger: #c0392b;
+    --radius: 14px;
+    --shadow: 0 6px 24px rgba(19, 78, 74, 0.1);
+
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100svh;
+    padding: 56px 48px 80px;
+    border-left: 6px solid #cfe9df;
+    overflow: hidden;
+    font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+    color: var(--text);
+
+    &__header {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        max-width: 960px;
+        margin: 0 auto 28px;
+    }
+
+    &__title {
+        margin: 0;
+        font-size: 2.1rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--primary);
+    }
+
+    &__subtitle {
+        margin-top: 6px;
+        font-size: 1rem;
+        color: var(--text);
+    }
+
+    &__create {
+        flex-shrink: 0;
+        padding: 12px 20px;
+        background: var(--primary);
+        color: #fff;
+        border: 0;
+        border-radius: 8px;
+        font: inherit;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(19, 78, 74, 0.25);
+        transition: background 0.2s ease, transform 0.1s ease;
+
+        &:hover { background: #0e3d3a; }
+        &:active { transform: translateY(1px); }
+    }
+
+    &__card {
+        position: relative;
+        z-index: 1;
+        max-width: 960px;
+        margin: 0 auto;
+        padding-top: 20px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    &__search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 154px;
+        margin: 0 20px 18px;
+        padding: 6px 12px;
+        background: #e9f5f1;
+        border: 1.5px solid #5fb8a2;
+        border-radius: 10px;
+        color: var(--muted);
+        box-sizing: content-box;
+
+        svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+        input {
+            width: 100%;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            font: inherit;
+            font-size: 0.85rem;
+            color: var(--text);
+
+            &::placeholder { color: var(--muted); }
+        }
+
+        &:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(47, 143, 123, 0.18); }
+    }
+
+    &__watermark {
+        position: absolute;
+        right: -60px;
+        bottom: -50px;
+        z-index: 0;
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    @media (max-width: 720px) {
+        padding: 32px 16px 60px;
+
+        &__header { flex-direction: column; }
+    }
+}

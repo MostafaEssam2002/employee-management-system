@@ -1,0 +1,81 @@
+.sidebar {
+    --sb-text: #1f2d2b;
+    --sb-active-bg: #e6f3ef;
+    --sb-active-text: #134e4a;
+
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 240px;
+    height: 100svh;
+    box-sizing: border-box;
+    padding: 28px 12px;
+    background: linear-gradient(180deg, #bfe3d8 0%, #cfe9df 60%, #e3f2ec 100%);
+    font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+    text-align: left;
+    overflow-y: auto;
+
+    &__brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 8px 36px;
+        color: var(--sb-active-text);
+        text-decoration: none;
+    }
+
+    &__brand-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+    }
+
+    &__nav {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        color: var(--sb-text);
+        font-size: 0.95rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background 0.2s ease, color 0.2s ease;
+
+        svg {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            opacity: 0.75;
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.45);
+        }
+
+        &--active {
+            background: var(--sb-active-bg);
+            color: var(--sb-active-text);
+
+            svg { opacity: 1; }
+        }
+    }
+
+    // Small screens: icons only
+    @media (max-width: 900px) {
+        width: 68px;
+        padding: 20px 8px;
+
+        &__brand { justify-content: center; margin: 0 0 28px; }
+        &__brand-name,
+        &__label { display: none; }
+        &__link { justify-content: center; padding: 12px 0; }
+    }
+}

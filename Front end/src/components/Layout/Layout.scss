@@ -1,0 +1,26 @@
+// Full-width root + cream background whenever the layout is on screen
+body:has(.app-layout) {
+    background: #f8f1e3;
+}
+
+#root:has(.app-layout) {
+    width: 100%;
+    max-width: none;
+    border-inline: 0;
+    text-align: left;
+}
+
+.app-layout {
+    display: flex;
+    min-height: 100svh;
+
+    &__content {
+        flex: 1;
+        min-width: 0; // lets wide tables scroll instead of stretching the page
+    }
+
+    // the sidebar replaces the old mint strip on the page's left edge
+    .departments {
+        border-left: 0;
+    }
+}
