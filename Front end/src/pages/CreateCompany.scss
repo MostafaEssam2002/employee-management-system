@@ -1,0 +1,299 @@
+.form-page {
+    --fp-primary: #134e4a;
+    --fp-primary-hover: #0e3d3a;
+    --fp-text: #1f2d2b;
+    --fp-muted: #6f8a85;
+    --fp-field-bg: #e6f3ef;
+    --fp-field-border: #7fc0ae;
+    --fp-error: #a62b2b;
+    --fp-error-bg: #fbefed;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-height: 100svh;
+    padding: 56px 48px 0;
+    overflow: hidden;
+    font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: 0;
+    color: var(--fp-text);
+
+    &__inner {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    &__header { margin-bottom: 26px; }
+
+    &__title {
+        margin: 0;
+        font-family: inherit;
+        font-size: 2.1rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        color: var(--fp-primary);
+    }
+
+    &__subtitle {
+        margin-top: 6px;
+        font-size: 1rem;
+        color: var(--fp-text);
+    }
+
+    &__card {
+        padding: 26px 28px 28px;
+        background: #fff;
+        border: 1px solid #e4e7e6;
+        border-radius: 14px;
+        box-shadow: 0 6px 24px rgba(19, 78, 74, 0.1);
+    }
+
+    &__section {
+        margin: 0 0 22px;
+        font-family: inherit;
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--fp-text);
+    }
+
+    &__success {
+        margin-top: 18px;
+        padding: 10px 14px;
+        background: #cfeedd;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: #25744a;
+    }
+
+    &__actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    &__footer {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: flex-end;
+        margin: auto -48px 0;
+        padding: 16px 48px;
+        border-top: 1px solid rgba(19, 78, 74, 0.15);
+        font-size: 0.85rem;
+        color: var(--fp-text);
+    }
+
+    // keep a gap between the buttons and the footer
+    &__inner { padding-bottom: 40px; }
+
+    &__watermark {
+        position: absolute;
+        right: -60px;
+        bottom: 40px;
+        z-index: 0;
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    @media (max-width: 720px) {
+        padding: 32px 16px 0;
+
+        &__footer { margin: auto -16px 0; padding: 16px; }
+        &__card { padding: 20px 18px 22px; }
+    }
+}
+
+/* ---------- field ---------- */
+.form-field {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--fp-text, #1f2d2b);
+    }
+
+    &__control { position: relative; }
+
+    &__icon {
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        display: flex;
+        transform: translateY(-50%);
+        color: #6c8d88;
+        pointer-events: none;
+
+        svg { width: 20px; height: 20px; }
+    }
+
+    &__error {
+        margin-top: 6px;
+        font-size: 0.8rem;
+        color: var(--fp-error, #a62b2b);
+    }
+}
+
+.form-input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 46px;
+    padding: 0 14px 0 44px;
+    font: inherit;
+    font-size: 0.95rem;
+    color: #173a40;
+    background: #e6f3ef;
+    border: 1px solid #7fc0ae;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+
+    &::placeholder { color: #7a9792; opacity: 1; }
+
+    &:focus {
+        background: #fff;
+        border-color: #134e4a;
+        box-shadow: 0 0 0 3px rgba(19, 78, 74, 0.14);
+    }
+
+    &--error,
+    &--error:focus {
+        background: #fbefed;
+        border-color: #a62b2b;
+    }
+
+    &--error:focus { box-shadow: 0 0 0 3px rgba(166, 43, 43, 0.14); }
+
+    &--has-toggle { padding-right: 46px; }
+}
+
+/* show / hide password button (sits inside the input, on the right) */
+.form-field__toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    display: flex;
+    padding: 4px;
+    color: #6c8d88;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    transform: translateY(-50%);
+
+    svg { width: 20px; height: 20px; }
+
+    &:hover { color: #134e4a; }
+}
+
+/* ---------- buttons ---------- */
+.form-btn {
+    box-sizing: border-box;
+    min-width: 240px;
+    padding: 12px 28px;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+
+    &:active { transform: translateY(1px); }
+
+    &--primary {
+        color: #fff;
+        background: #134e4a;
+        border: 1px solid #134e4a;
+        box-shadow: 0 4px 10px rgba(19, 78, 74, 0.25);
+
+        &:hover { background: #0e3d3a; }
+    }
+
+    &--secondary {
+        color: #134e4a;
+        background: #e6f3ef;
+        border: 1px solid #7fc0ae;
+
+        &:hover { background: #d3ebe3; }
+    }
+}
+
+/* ---------- role picker (3 clickable cards) ---------- */
+.role-picker {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+
+    &__option {
+        position: relative;
+        margin: 0 !important;
+        cursor: pointer;
+
+        /* real radio stays in the DOM (form value + validation), just not visible */
+        input:disabled { cursor: not-allowed; }
+
+        input {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+    }
+
+    &__card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #173a40;
+        background: #e6f3ef;
+        border: 1px solid #7fc0ae;
+        border-radius: 10px;
+        transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+
+        svg { width: 26px; height: 26px; color: #6c8d88; transition: color 0.15s; }
+    }
+
+    &__option:hover &__card { background: #d6ece5; }
+
+    input:focus-visible + &__card { box-shadow: 0 0 0 3px rgba(19, 78, 74, 0.25); }
+
+    /* the user's current role: can't be picked again */
+    input:disabled + &__card {
+        color: #7a9792;
+        background: #eef3f1;
+        border-style: dashed;
+        border-color: #b5cdc7;
+        cursor: not-allowed;
+        opacity: 0.75;
+
+        small { font-size: 0.72rem; font-weight: 400; }
+    }
+
+    &__option:hover input:disabled + &__card { background: #eef3f1; }
+
+    input:checked + &__card {
+        color: #fff;
+        background: #134e4a;
+        border-color: #134e4a;
+
+        svg { color: #fff; }
+    }
+}

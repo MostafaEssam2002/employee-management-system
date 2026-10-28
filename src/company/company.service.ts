@@ -81,6 +81,13 @@ export class CompanyService {
         where: { id },
         select: {
           name: true,
+          departments:{
+            select:{
+              id:true,
+              name :true,
+              _count:{select:{employees:true}}
+            }
+          },
           _count: { select: { departments: true } },
         },
       }),
@@ -97,6 +104,7 @@ export class CompanyService {
     return {
       data: {
         name: company.name,
+        departments:company.departments,
         numberOfDepartments: company._count.departments,
         numberOfEmployees,
       },

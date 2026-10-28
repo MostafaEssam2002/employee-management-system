@@ -93,3 +93,23 @@
         color: var(--muted);
     }
 }
+
+.table__row--deleting {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.table__spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #d9d9d9;
+    border-top-color: #c0392b;
+    border-radius: 50%;
+    animation: table-spin 0.7s linear infinite;
+}
+
+@keyframes table-spin {
+    to { transform: rotate(360deg); }
+}

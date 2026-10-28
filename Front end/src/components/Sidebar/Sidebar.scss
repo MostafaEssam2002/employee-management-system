@@ -15,6 +15,36 @@
     font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
     text-align: left;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+
+    // soft light facet in the bottom corner
+    &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 42%;
+        background: rgba(255, 255, 255, 0.22);
+        clip-path: polygon(0 45%, 100% 100%, 0 100%);
+        pointer-events: none;
+    }
+
+    &__brand,
+    &__nav,
+    &__version {
+        position: relative;
+        z-index: 1;
+    }
+
+    &__version {
+        margin-top: auto;
+        padding: 16px 12px 0;
+        border-top: 1px solid rgba(19, 78, 74, 0.15);
+        font-size: 0.85rem;
+        color: var(--sb-text);
+    }
 
     &__brand {
         display: flex;
@@ -35,6 +65,38 @@
         display: flex;
         flex-direction: column;
         gap: 6px;
+    }
+
+    &__group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__sub {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin: 0 0 4px 22px;
+        padding-left: 18px;
+        border-left: 2px solid rgba(19, 78, 74, 0.2);
+    }
+
+    &__sublink {
+        padding: 7px 10px;
+        border-radius: 8px;
+        color: var(--sb-text);
+        font-size: 0.88rem;
+        text-decoration: none;
+        transition: background 0.2s ease, color 0.2s ease;
+
+        &:hover { background: rgba(255, 255, 255, 0.45); }
+
+        &--active {
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--sb-active-text);
+            font-weight: 600;
+        }
     }
 
     &__link {
@@ -75,7 +137,9 @@
 
         &__brand { justify-content: center; margin: 0 0 28px; }
         &__brand-name,
+        &__version,
         &__label { display: none; }
         &__link { justify-content: center; padding: 12px 0; }
+        &__sub { display: none; }
     }
 }

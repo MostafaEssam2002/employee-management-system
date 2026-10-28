@@ -73,35 +73,81 @@ export class DepartmentService {
     };
   }
 
-  async findOne(id: number) {
-    this.logger.log("fetching department")
+  
+  async findOne(id: number, page: number = 1) {
+    this.logger.log(`Fetching department ${id}, page ${page}`);
+
+    const limit = 10;
+
+    if (!Number.isInteger(page) || page < 1) {
+      throw new BadRequestException(
+        "Page must be a positive integer",
+      );
+    }
+
     const dept = await this.prisma.department.findUnique({
-      where:{id:id},
-      select:{
-        id:true,
-        name:true,
-        company:{
-          select:{
-            name:true
-          }
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        company: {
+          select: {
+            name: true,
+          },
         },
-        _count:{
-          select:{
-            employees:true
-          }
-        }
-      }
-    })
-    if(!dept){
-      this.logger.warn(`department with ${id} not found`)
-      throw new NotFoundException ('Department not found');
+        _count: {
+          select: {
+            employees: true,
+          },
+        },
+      },
+    });
+
+    if (!dept) {
+      this.logger.warn(`Department with id ${id} not found`);
+      throw new NotFoundException("Department not found");
     }
+
+    const total = dept._count.employees;
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
+    const employees = await this.prisma.employee.findMany({
+      where: {
+        departmentId: id,
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        id: "asc",
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+
     return {
-      message:"department fetched successfully",
-      data:{id:dept.id,name:dept.name,company:dept.company.name,numberOfEmployees:dept._count.employees}
-    }
-    // `This action returns a #${id} department`;
+      message: "Department fetched successfully",
+      data: {
+        id: dept.id,
+        name: dept.name,
+        company: dept.company.name,
+        numberOfEmployees: total,
+        employees,
+      },
+      pagination: {
+        currentPage: page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
+
 
   async update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
   this.logger.log('updating department');

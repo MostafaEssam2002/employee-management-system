@@ -1,28 +1,43 @@
-async function SubmitForm(event,url) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData.entries());
-    try{
-        const response = await fetch(url,{
-            method:"POST",
-            headers:{
+// Sends the form as JSON. Resolves with the parsed response,
+// throws an Error (with a readable message) when the request fails.
+async function SubmitForm(event, url) {
+    event.preventDefault()
+
+    const form = event.target
+    const formData = new FormData(form)
+    const data = Object.fromEntries(formData.entries())
+
+    // FormData always yields strings: convert <input type="number"> fields back to numbers
+    for (const el of form.elements) {
+        if (el.name && el.type === "number" && el.value !== "") {
+            data[el.name] = Number(el.value)
+        }
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
                 "Content-Type": "application/json",
             },
-            credentials:"include",
-            body:JSON.stringify(data)
+            credentials: "include",
+            body: JSON.stringify(data),
         })
-        const result = await response.json()
+
+        // the body may be empty / not JSON on some errors
+        const result = await response.json().catch(() => ({}))
+
         if (!response.ok) {
             throw new Error(
-                result.message || "Registration failed"
-            );
+                result.message || `Request failed (${response.status})`
+            )
         }
-        if(result.token){
-            console.log(result.token)
-        }
-    }catch(error){
-        console.error("Registration error:", error.message);
+
+        return result
+    } catch (error) {
+        console.error("Request error:", error.message)
+        throw error
     }
-    return data
 }
+
 export default SubmitForm

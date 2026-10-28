@@ -5,6 +5,7 @@ import Form from './../components/Form';
 import BrainWiseLogo from "../assets/BrainWiseLogo"
 import LoginIllustration from "../assets/LoginIllustration"
 import "./Login.css"
+import { useNavigate } from "react-router-dom";
 
 const EyeOffIcon = () => (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -23,7 +24,8 @@ const EyeIcon = () => (
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false)
-
+    const navigate = useNavigate();
+    const [error, setError] = useState("");
     return (
         <div className="login-page">
             <div className="login-bg-mark" aria-hidden="true" />
@@ -40,8 +42,13 @@ const Login = () => {
             <main className="login-card">
                 <h1 className="login-title">Employee Login</h1>
 
-                <Form action="http://localhost:3000/auth/login" method="post">
+                <Form action="http://localhost:3000/auth/login" method="post" onSuccess={(res) => {
+            localStorage.setItem("user", JSON.stringify(res.data));
+            navigate("/departments");
+        }}
+        onError={setError}>
                     <div className="login-field">
+                        {error && <p className="login-error">{error}</p>}
                         <label htmlFor="email">Email Address</label>
                         <Input name="email" type="email" placeHolder="corporate.email@brainwise.com" id="email" className="emailClass login-input" />
                     </div>

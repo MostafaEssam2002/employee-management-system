@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
 import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -42,8 +42,11 @@ export class DepartmentController {
     description:
       'Returns the department details, its associated company name, and its employee count. Requires a JWT and the Admin role.',
   })
-  findOne(@Param('id') id: string) {
-    return this.departmentService.findOne(+id);
+  findOne(
+    @Param("id", ParseIntPipe) id: number,
+    @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    return this.departmentService.findOne(id, page);
   }
 
   @Patch(':id')

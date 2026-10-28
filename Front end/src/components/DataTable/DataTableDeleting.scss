@@ -1,0 +1,40 @@
+.table__row--deleting {
+    opacity: 0.55;
+    pointer-events: none;
+    background: #fdecea;
+    animation: table-row-pulse 1.2s ease-in-out infinite;
+
+    td {
+        background: transparent;
+    }
+}
+
+.table__deleting {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #c0392b;
+    white-space: nowrap;
+}
+
+.table__spinner {
+    display: inline-block;
+    flex: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f0c4be;
+    border-top-color: #c0392b;
+    border-radius: 50%;
+    animation: table-spin 0.7s linear infinite;
+}
+
+@keyframes table-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes table-row-pulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 0.85; }
+}

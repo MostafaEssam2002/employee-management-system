@@ -68,3 +68,6 @@ export const ReportsIcon = () => (
 export const SettingsIcon = () => (
     <svg {...base}><circle cx="12" cy="12" r="3" /><path d="M12 2.500v3M12 18.500v3M2.500 12h3M18.500 12h3M5.300 5.300l2.100 2.100M16.600 16.600l2.100 2.100M18.700 5.300l-2.100 2.100M7.400 16.600l-2.100 2.100" /></svg>
 )
+export const TextIcon = () => (
+    <svg {...base}><path d="M5 7V5.500h14V7M12 5.500V19M9 19h6" /></svg>
+)
