@@ -8,11 +8,13 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerMiddleware } from './logger/logger.middleware';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [CompanyModule, DepartmentModule, EmployeeModule, UserModule, AuthModule,ConfigModule.forRoot({
       isGlobal: true,
-    })],
+    }), DashboardModule, ReportModule],
   controllers: [AppController],
   providers: [AppService],
 })

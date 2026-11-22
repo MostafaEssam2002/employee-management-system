@@ -40,18 +40,21 @@ export type DepartmentMinAggregateOutputType = {
   id: number | null
   name: string | null
   companyId: number | null
+  createdAt: Date | null
 }
 
 export type DepartmentMaxAggregateOutputType = {
   id: number | null
   name: string | null
   companyId: number | null
+  createdAt: Date | null
 }
 
 export type DepartmentCountAggregateOutputType = {
   id: number
   name: number
   companyId: number
+  createdAt: number
   _all: number
 }
 
@@ -70,18 +73,21 @@ export type DepartmentMinAggregateInputType = {
   id?: true
   name?: true
   companyId?: true
+  createdAt?: true
 }
 
 export type DepartmentMaxAggregateInputType = {
   id?: true
   name?: true
   companyId?: true
+  createdAt?: true
 }
 
 export type DepartmentCountAggregateInputType = {
   id?: true
   name?: true
   companyId?: true
+  createdAt?: true
   _all?: true
 }
 
@@ -175,6 +181,7 @@ export type DepartmentGroupByOutputType = {
   id: number
   name: string
   companyId: number
+  createdAt: Date
   _count: DepartmentCountAggregateOutputType | null
   _avg: DepartmentAvgAggregateOutputType | null
   _sum: DepartmentSumAggregateOutputType | null
@@ -204,6 +211,7 @@ export type DepartmentWhereInput = {
   id?: Prisma.IntFilter<"Department"> | number
   name?: Prisma.StringFilter<"Department"> | string
   companyId?: Prisma.IntFilter<"Department"> | number
+  createdAt?: Prisma.DateTimeFilter<"Department"> | Date | string
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   employees?: Prisma.EmployeeListRelationFilter
 }
@@ -212,6 +220,7 @@ export type DepartmentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   company?: Prisma.CompanyOrderByWithRelationInput
   employees?: Prisma.EmployeeOrderByRelationAggregateInput
   _relevance?: Prisma.DepartmentOrderByRelevanceInput
@@ -224,6 +233,7 @@ export type DepartmentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.DepartmentWhereInput | Prisma.DepartmentWhereInput[]
   name?: Prisma.StringFilter<"Department"> | string
   companyId?: Prisma.IntFilter<"Department"> | number
+  createdAt?: Prisma.DateTimeFilter<"Department"> | Date | string
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   employees?: Prisma.EmployeeListRelationFilter
 }, "id">
@@ -232,6 +242,7 @@ export type DepartmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   _count?: Prisma.DepartmentCountOrderByAggregateInput
   _avg?: Prisma.DepartmentAvgOrderByAggregateInput
   _max?: Prisma.DepartmentMaxOrderByAggregateInput
@@ -246,10 +257,12 @@ export type DepartmentScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Department"> | number
   name?: Prisma.StringWithAggregatesFilter<"Department"> | string
   companyId?: Prisma.IntWithAggregatesFilter<"Department"> | number
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"Department"> | Date | string
 }
 
 export type DepartmentCreateInput = {
   name: string
+  createdAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutDepartmentsInput
   employees?: Prisma.EmployeeCreateNestedManyWithoutDepartmentInput
 }
@@ -258,11 +271,13 @@ export type DepartmentUncheckedCreateInput = {
   id?: number
   name: string
   companyId: number
+  createdAt?: Date | string
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutDepartmentsNestedInput
   employees?: Prisma.EmployeeUpdateManyWithoutDepartmentNestedInput
 }
@@ -271,6 +286,7 @@ export type DepartmentUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
@@ -278,16 +294,19 @@ export type DepartmentCreateManyInput = {
   id?: number
   name: string
   companyId: number
+  createdAt?: Date | string
 }
 
 export type DepartmentUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DepartmentUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DepartmentListRelationFilter = {
@@ -310,6 +329,7 @@ export type DepartmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type DepartmentAvgOrderByAggregateInput = {
@@ -321,12 +341,14 @@ export type DepartmentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type DepartmentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
 }
 
 export type DepartmentSumOrderByAggregateInput = {
@@ -397,12 +419,14 @@ export type DepartmentUpdateOneRequiredWithoutEmployeesNestedInput = {
 
 export type DepartmentCreateWithoutCompanyInput = {
   name: string
+  createdAt?: Date | string
   employees?: Prisma.EmployeeCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUncheckedCreateWithoutCompanyInput = {
   id?: number
   name: string
+  createdAt?: Date | string
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
@@ -439,10 +463,12 @@ export type DepartmentScalarWhereInput = {
   id?: Prisma.IntFilter<"Department"> | number
   name?: Prisma.StringFilter<"Department"> | string
   companyId?: Prisma.IntFilter<"Department"> | number
+  createdAt?: Prisma.DateTimeFilter<"Department"> | Date | string
 }
 
 export type DepartmentCreateWithoutEmployeesInput = {
   name: string
+  createdAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutDepartmentsInput
 }
 
@@ -450,6 +476,7 @@ export type DepartmentUncheckedCreateWithoutEmployeesInput = {
   id?: number
   name: string
   companyId: number
+  createdAt?: Date | string
 }
 
 export type DepartmentCreateOrConnectWithoutEmployeesInput = {
@@ -470,6 +497,7 @@ export type DepartmentUpdateToOneWithWhereWithoutEmployeesInput = {
 
 export type DepartmentUpdateWithoutEmployeesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutDepartmentsNestedInput
 }
 
@@ -477,27 +505,32 @@ export type DepartmentUncheckedUpdateWithoutEmployeesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DepartmentCreateManyCompanyInput = {
   id?: number
   name: string
+  createdAt?: Date | string
 }
 
 export type DepartmentUpdateWithoutCompanyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employees?: Prisma.EmployeeUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateWithoutCompanyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateManyWithoutCompanyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -535,6 +568,7 @@ export type DepartmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   id?: boolean
   name?: boolean
   companyId?: boolean
+  createdAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   employees?: boolean | Prisma.Department$employeesArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentCountOutputTypeDefaultArgs<ExtArgs>
@@ -546,9 +580,10 @@ export type DepartmentSelectScalar = {
   id?: boolean
   name?: boolean
   companyId?: boolean
+  createdAt?: boolean
 }
 
-export type DepartmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "companyId", ExtArgs["result"]["department"]>
+export type DepartmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "companyId" | "createdAt", ExtArgs["result"]["department"]>
 export type DepartmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   employees?: boolean | Prisma.Department$employeesArgs<ExtArgs>
@@ -565,6 +600,7 @@ export type $DepartmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     id: number
     name: string
     companyId: number
+    createdAt: Date
   }, ExtArgs["result"]["department"]>
   composites: {}
 }
@@ -939,6 +975,7 @@ export interface DepartmentFieldRefs {
   readonly id: Prisma.FieldRef<"Department", 'Int'>
   readonly name: Prisma.FieldRef<"Department", 'String'>
   readonly companyId: Prisma.FieldRef<"Department", 'Int'>
+  readonly createdAt: Prisma.FieldRef<"Department", 'DateTime'>
 }
     
 

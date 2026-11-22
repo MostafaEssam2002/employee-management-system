@@ -1,0 +1,108 @@
+.search-select {
+    &__input {
+        padding-right: 46px;
+        text-overflow: ellipsis;
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+    }
+
+    &__chevron {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        display: flex;
+        padding: 4px;
+        color: #6c8d88;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        transform: translateY(-50%);
+
+        &:hover:not(:disabled) { color: #134e4a; }
+        &:disabled { cursor: not-allowed; opacity: 0.6; }
+    }
+
+    &__panel {
+        position: absolute;
+        top: calc(100% + 6px);
+        right: 0;
+        left: 0;
+        z-index: 20;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #7fc0ae;
+        border-radius: 10px;
+        box-shadow: 0 12px 28px rgba(19, 78, 74, 0.18);
+    }
+
+    &__list {
+        max-height: 240px;
+        margin: 0;
+        padding: 6px;
+        overflow-y: auto;
+        list-style: none;
+    }
+
+    &__option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        color: #173a40;
+        border-radius: 8px;
+        cursor: pointer;
+
+        &--active { background: #e6f3ef; }
+
+        &--selected {
+            font-weight: 600;
+            color: #134e4a;
+        }
+    }
+
+    &__label {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__meta {
+        flex: none;
+        font-size: 0.8rem;
+        color: #6f8a85;
+    }
+
+    &__status {
+        padding: 14px 12px;
+        font-size: 0.9rem;
+        color: #6f8a85;
+        text-align: center;
+
+        &--error { color: #a62b2b; }
+    }
+
+    &__retry {
+        margin-left: 8px;
+        padding: 0;
+        font: inherit;
+        font-weight: 600;
+        color: #134e4a;
+        text-decoration: underline;
+        background: none;
+        border: 0;
+        cursor: pointer;
+    }
+
+    &__hint {
+        padding: 8px 12px 4px;
+        font-size: 0.8rem;
+        color: #6f8a85;
+        text-align: center;
+    }
+}

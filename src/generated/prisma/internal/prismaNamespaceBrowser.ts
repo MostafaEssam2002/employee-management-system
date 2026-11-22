@@ -78,7 +78,8 @@ export const UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   role: 'role',
-  password: 'password'
+  password: 'password',
+  createdAt: 'createdAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -86,7 +87,8 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 
 export const CompanyScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  createdAt: 'createdAt'
 } as const
 
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
@@ -95,7 +97,8 @@ export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeo
 export const DepartmentScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  companyId: 'companyId'
+  companyId: 'companyId',
+  createdAt: 'createdAt'
 } as const
 
 export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
@@ -110,7 +113,8 @@ export const EmployeeScalarFieldEnum = {
   departmentId: 'departmentId',
   status: 'status',
   hiredOn: 'hiredOn',
-  designation: 'designation'
+  designation: 'designation',
+  createdAt: 'createdAt'
 } as const
 
 export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]

@@ -24,10 +24,14 @@ model User {
   email     String   @unique
   role  ROLE @default(Employee)
   password    String
+  createdAt   DateTime     @default(now())
+
 }
 model Company {
   id          Int          @id @default(autoincrement())
   name        String
+  createdAt   DateTime     @default(now())
+  // updatedAt   DateTime     @updatedAt
   departments Department[]
 }
 model Department{
@@ -36,6 +40,7 @@ model Department{
   companyId Int
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   employees Employee[]
+  createdAt   DateTime     @default(now())
   @@index([companyId])
 }
 model Employee{
@@ -49,5 +54,6 @@ model Employee{
   hiredOn DateTime?   
   designation String
   department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
   @@index([departmentId])
 }
