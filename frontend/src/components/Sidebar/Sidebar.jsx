@@ -1,6 +1,6 @@
 
 import './Sidebar.scss'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import BrainWiseLogo from '../../assets/BrainWiseLogo'
 
 import {
@@ -12,33 +12,52 @@ import {
     ReportsIcon,
     SettingsIcon,
     PlusIcon,
+    LogoutIcon,
 } from '../../assets/icons'
+import { logout } from '../../utilis/session'
+import { ADMIN_AND_MANAGER, ADMIN_ONLY, ALL_ROLES, getRole, hasRole } from '../../utilis/auth'
 
 const NAV_ITEMS = [
     // { path: '/dashboard', label: 'Dashboard', Icon: DashboardIcon },
-    { path: '/dashboard', label: 'Dashboard', Icon: DashboardIcon },
-    { path: '/companies', label: 'Companies', Icon: BuildingIcon },
-    { path: '/departments', label: 'Departments', Icon: DepartmentsIcon },
-    { path: '/employees', label: 'Employees', Icon: EmployeesIcon },
-    { path: '/users', label: 'Users', Icon: UserIcon },
-    { path: '/reports', label: 'Reports', Icon: ReportsIcon },
-    { path: '/settings', label: 'Settings', Icon: SettingsIcon },
+    { path: '/dashboard', label: 'Dashboard', Icon: DashboardIcon, roles: ALL_ROLES },
+    { path: '/companies', label: 'Companies', Icon: BuildingIcon, roles: ADMIN_AND_MANAGER },
+    { path: '/departments', label: 'Departments', Icon: DepartmentsIcon, roles: ALL_ROLES },
+    { path: '/employees', label: 'Employees', Icon: EmployeesIcon, roles: ADMIN_AND_MANAGER },
+    { path: '/users', label: 'Users', Icon: UserIcon, roles: ADMIN_ONLY },
+    { path: '/reports', label: 'Reports', Icon: ReportsIcon, roles: ADMIN_AND_MANAGER },
+    { path: '/settings', label: 'Settings', Icon: SettingsIcon, roles: ALL_ROLES },
     {
         path: '/add-company',
         label: 'Add New',
         Icon: PlusIcon,
         matchPrefix: '/add-',
+        roles: ADMIN_AND_MANAGER,
         children: [
-            { path: '/add-company', label: 'Company' },
-            { path: '/add-department', label: 'Department' },
-            { path: '/add-employee', label: 'Employee' },
-            { path: '/add-user', label: 'User' },
+            { path: '/add-company', label: 'Company', roles: ADMIN_ONLY },
+            { path: '/add-department', label: 'Department', roles: ADMIN_AND_MANAGER },
+            { path: '/add-employee', label: 'Employee', roles: ADMIN_AND_MANAGER },
+            { path: '/add-user', label: 'User', roles: ADMIN_ONLY },
         ],
     },
 ]
 
 const Sidebar = () => {
     const { pathname: currentPath } = useLocation()
+    const navigate = useNavigate()
+    const handleLogout = async () => {
+        await logout() // clears the server cookie and the local session
+        navigate('/login', { replace: true })
+    }
+    const role = getRole()
+
+    // Only show what this role can actually open; the "Add New" group links to its first allowed child
+    const navItems = NAV_ITEMS
+        .filter((item) => hasRole(item.roles, role))
+        .map((item) => {
+            if (!item.children) return item
+            const children = item.children.filter((child) => hasRole(child.roles, role))
+            return { ...item, children, path: children[0]?.path ?? item.path }
+        })
 
     return (
         <aside className="sidebar">
@@ -52,7 +71,7 @@ const Sidebar = () => {
             </Link>
 
             <nav className="sidebar__nav" aria-label="Main navigation">
-                {NAV_ITEMS.map(({ path, label, Icon, matchPrefix, children }) => {
+                {navItems.map(({ path, label, Icon, matchPrefix, children }) => {
                     const isActive = matchPrefix
                         ? currentPath.startsWith(matchPrefix)
                         : currentPath === path
@@ -101,9 +120,15 @@ const Sidebar = () => {
                 })}
             </nav>
 
-            <span className="sidebar__version">
-                Version 1.2.0
-            </span>
+            <div className="sidebar__footer">
+                <button type="button" className="sidebar__link sidebar__logout" onClick={handleLogout} title="Log out">
+                    <LogoutIcon />
+                    <span className="sidebar__label">Log out</span>
+                </button>
+                <span className="sidebar__version">
+                    Version 1.2.0
+                </span>
+            </div>
         </aside>
     )
 }

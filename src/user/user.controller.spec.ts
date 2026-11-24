@@ -94,36 +94,36 @@ describe('UserController', () => {
       expect(userServiceMock.findAll).toHaveBeenCalledWith(2);
     });
 
-    it('findOne() converts the id param to a number', async () => {
+    it('findOne() passes the (already parsed) id', async () => {
       userServiceMock.findOne.mockResolvedValue({ data: {} });
 
-      await controller.findOne('7');
+      await controller.findOne(7);
 
       expect(userServiceMock.findOne).toHaveBeenCalledWith(7);
     });
 
-    it('update() converts the id param to a number and passes the body', async () => {
+    it('update() passes the id, the body and the acting admin\'s id', async () => {
       const dto = { name: 'New Name' };
       userServiceMock.update.mockResolvedValue({ message: 'ok' });
 
-      await controller.update('4', dto);
+      await controller.update(4, dto, { user: { sub: 1 } });
 
-      expect(userServiceMock.update).toHaveBeenCalledWith(4, dto);
+      expect(userServiceMock.update).toHaveBeenCalledWith(4, dto, 1);
     });
 
-    it('remove() converts the id param to a number', async () => {
+    it('remove() passes the id and the acting admin\'s id', async () => {
       userServiceMock.remove.mockResolvedValue({ message: 'ok' });
 
-      await controller.remove('9');
+      await controller.remove(9, { user: { sub: 1 } });
 
-      expect(userServiceMock.remove).toHaveBeenCalledWith(9);
+      expect(userServiceMock.remove).toHaveBeenCalledWith(9, 1);
     });
 
     it('propagates errors thrown by the service', async () => {
       const error = new Error('boom');
       userServiceMock.findOne.mockRejectedValue(error);
 
-      await expect(controller.findOne('1')).rejects.toBe(error);
+      await expect(controller.findOne(1)).rejects.toBe(error);
     });
   });
 

@@ -33,13 +33,31 @@
 
     &__brand,
     &__nav,
-    &__version {
+    &__footer {
         position: relative;
         z-index: 1;
     }
 
-    &__version {
+    &__footer {
         margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &__logout {
+        width: 100%;
+        box-sizing: border-box;
+        border: 0;
+        background: transparent;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+
+        &:hover { background: rgba(185, 28, 28, 0.12); color: #991b1b; }
+    }
+
+    &__version {
         padding: 16px 12px 0;
         border-top: 1px solid rgba(19, 78, 74, 0.15);
         font-size: 0.85rem;

@@ -111,15 +111,20 @@ with the frontend's origin.
 
 | Route | Access |
 | --- | --- |
-| `/login` | Public |
-| `/register` | Public |
-| `/landingpage` | Declared as a public landing page and within a protected route group |
-| `/unauthorized` | Public |
-| `/departments` | Admin, Manager, or Employee |
-| `/companies`, `/company/:id`, `/department/:id`, `/employee/:id` | Admin |
-| `/employees`, `/users` | Admin |
-| `/add-company`, `/add-department`, `/add-employee`, `/add-user` | Admin |
-| `/update/company/:id`, `/update/department/:id`, `/update/employee/:id` | Admin |
+| `/login`, `/register`, `/unauthorized` | Public |
+| `/dashboard`, `/departments`, `/landingpage` | Admin, Manager, or Employee (Employee: read-only, no employee data) |
+| `/companies`, `/company/:id`, `/department/:id`, `/employee/:id`, `/employees`, `/reports` | Admin or Manager |
+| `/add-department`, `/add-employee`, `/update/department/:id`, `/update/employee/:id` | Admin or Manager |
+| `/add-company`, `/update/company/:id` | Admin |
+| `/users`, `/user/:id`, `/add-user`, `/update/user/:id` | Admin (list, view, create, edit, delete users) |
+
+Delete actions are Admin-only. The sidebar and action buttons are filtered with
+the same rules (`src/utilis/auth.js`), and the backend enforces them with
+`@Roles(...)` on each endpoint, so hiding a button is never the only protection.
+
+Sessions last 15 minutes (the login response carries `expiresAt`). When the session
+expires, or any API call returns 401, the local session is cleared and the user is sent to
+`/login?reason=expired`.
 
 `ProtectedRoute` reads a JSON user object from `localStorage` under the key
 `user`. A missing or unreadable value redirects to `/login`; a role not in the
@@ -137,6 +142,7 @@ an authoritative API specification are not part of this repository.
 | --- | --- | --- |
 | `POST` | `/auth/login` | Sends login form fields (`email`, `password`). On success, the frontend stores `response.data` as the local user and navigates to `/departments`. |
 | `POST` | `/auth/register` | Sends registration form fields: `name`, `email`, `password`, `mobile`, `designation`, `departmentId`, `address`, `hiredOn`, and `role` (the form supplies `Employee`). |
+| `POST` | `/auth/logout` | Called by the sidebar **Log out** button; clears the session cookie, then the local session, then goes to `/login`. |
 
 ### Companies
 
@@ -176,6 +182,7 @@ an authoritative API specification are not part of this repository.
 | `POST` | `/user` | Creates a user. The form includes `name`, `email`, `password`, and `role`. |
 | `GET` | `/user/{id}` | Reads a user for the update form; the frontend reads `data`. |
 | `PATCH` | `/user/{id}` | Updates a user. The form submits JSON; empty fields are omitted. |
+| `DELETE` | `/user/{id}` | Deletes a user. An admin cannot delete their own account or change their own role (the API rejects both). |
 
 `{id}` is the entity identifier. `page` is the requested page number and starts
 at `1`. Create and update requests send JSON with a `Content-Type: application/json`

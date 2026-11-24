@@ -1,9 +1,12 @@
+import { assertAuthorized } from './session'
+
 async function DeleteData( url) {
     try {
         const response = await fetch(url, {
             method: "DELETE",
             credentials: "include",
         })
+        assertAuthorized(response, url)
 
         // the body may be empty / not JSON on some errors
         const result = await response.json().catch(() => ({}))

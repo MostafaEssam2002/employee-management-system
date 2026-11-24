@@ -5,6 +5,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { SESSION_MAX_AGE_SECONDS } from './auth.constants';
 @Module({
   controllers: [AuthController],
   providers: [AuthService,JwtStrategy],
@@ -17,7 +18,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: '1h',
+          expiresIn: SESSION_MAX_AGE_SECONDS,
         },
       }),
     }),

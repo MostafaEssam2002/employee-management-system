@@ -16,31 +16,34 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
+  @Roles('Admin', 'Manager')
   @Post()
   @ApiOperation({
     summary: 'Create a department',
     description:
-      'Creates a department and associates it with the company specified by companyId. Requires a JWT and the Admin role.',
+      'Creates a department and associates it with the company specified by companyId. Requires a JWT and the Admin or Manager role.',
   })
   create(@Body() createDepartmentDto: CreateDepartmentDto) {
     return this.departmentService.create(createDepartmentDto);
   }
 
+  @Roles('Admin', 'Manager', 'Employee')
   @Get()
   @ApiOperation({
     summary: 'List departments',
     description:
-      'Returns departments with their company names, employee counts, and pagination details. Returns 10 departments per page; use page to select a page number. Requires a JWT and the Admin role.',
+      'Returns departments with their company names, employee counts, and pagination details. Returns 10 departments per page; use page to select a page number. Requires a JWT and any authenticated role.',
   })
   findAll(@Query() paginationDto: PaginationDto) {
     return this.departmentService.findAll(Number(paginationDto.page));
   }
 
+  @Roles('Admin', 'Manager')
   @Get(':id')
   @ApiOperation({
     summary: 'Get a department by ID',
     description:
-      'Returns the department details, its associated company name, and its employee count. Requires a JWT and the Admin role.',
+      'Returns the department details, its associated company name, and its employee count. Requires a JWT and the Admin or Manager role.',
   })
   findOne(
     @Param("id", ParseIntPipe) id: number,
@@ -49,11 +52,12 @@ export class DepartmentController {
     return this.departmentService.findOne(id, page);
   }
 
+  @Roles('Admin', 'Manager')
   @Patch(':id')
   @ApiOperation({
     summary: 'Update a department',
     description:
-      'Updates the specified department. The associated company can also be changed by supplying companyId. Requires a JWT and the Admin role.',
+      'Updates the specified department. The associated company can also be changed by supplying companyId. Requires a JWT and the Admin or Manager role.',
   })
   update(@Param('id') id: string, @Body() updateDepartmentDto: UpdateDepartmentDto) {
     return this.departmentService.update(+id, updateDepartmentDto);

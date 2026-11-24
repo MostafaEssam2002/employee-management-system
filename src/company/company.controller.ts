@@ -26,21 +26,23 @@ export class CompanyController {
     return this.companyService.create(createCompanyDto);
   }
 
+  @Roles('Admin', 'Manager', 'Employee')
   @Get()
   @ApiOperation({
     summary: 'List companies',
     description:
-      'Returns companies ordered by ID, including department and employee counts, and pagination details. Returns 10 companies per page; use page to select a page number. Requires a JWT and the Admin role.',
+      'Returns companies ordered by ID, including department and employee counts, and pagination details. Returns 10 companies per page; use page to select a page number. Requires a JWT and any authenticated role.',
   })
   findAll(@Query() paginationDto: PaginationDto) {
     return this.companyService.findAll(paginationDto.page, 10);
   }
 
+  @Roles('Admin', 'Manager', 'Employee')
   @Get(':id')
   @ApiOperation({
     summary: 'Get a company by ID',
     description:
-      'Returns the company name and its department and employee counts. Requires a JWT and the Admin role.',
+      'Returns the company name and its department and employee counts. Requires a JWT and any authenticated role.',
   })
   findOne(@Param('id') id: string) {
     return this.companyService.findOne(+id);

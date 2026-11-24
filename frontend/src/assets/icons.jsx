@@ -53,6 +53,9 @@ export const PlusIcon = () => (
     <svg {...base}><path d="M12 5v14M5 12h14" /></svg>
 )
 
+export const LogoutIcon = () => (
+    <svg {...base}><path d="M9 4H5.500A1.500 1.500 0 0 0 4 5.500v13A1.500 1.500 0 0 0 5.500 20H9" /><path d="m16 8 4 4-4 4M20 12H9" /></svg>
+)
 export const DashboardIcon = () => (
     <svg {...base}><circle cx="12" cy="13" r="8" /><path d="m12 13 4-4M12 5v1.500M5.500 13H4M20 13h-1.500" /></svg>
 )
@@ -98,4 +101,19 @@ export const ArrowDownIcon = () => (
 )
 export const ChartIcon = () => (
     <svg {...base}><path d="M5 20V10M12 20V4M19 20v-7" /></svg>
+)
+export const FilterIcon = () => (
+    <svg {...base}><path d="M4 5h16l-6 7.500V19l-4 1.500v-8z" /></svg>
+)
+export const PrinterIcon = () => (
+    <svg {...base}><path d="M7 9V3h10v6M7 17H5a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-2" /><path d="M7 14h10v7H7z" /></svg>
+)
+export const SheetIcon = () => (
+    <svg {...base}><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M4 9h16M4 15h16M10 9v12" /></svg>
+)
+export const ChevronLeftIcon = () => (
+    <svg {...base}><path d="m15 6-6 6 6 6" /></svg>
+)
+export const ChevronRightIcon = () => (
+    <svg {...base}><path d="m9 6 6 6-6 6" /></svg>
 )

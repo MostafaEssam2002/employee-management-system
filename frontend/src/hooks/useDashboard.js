@@ -39,7 +39,8 @@ const fetchRecentEmployees = async () => {
 
 // Loads everything the dashboard needs. The stats come from GET /dashboard (page-level error if
 // it fails); top companies and recent employees fail on their own so one section can't blank the page.
-const useDashboard = () => {
+// includeEmployees=false for roles that can't read /employee (Employee role) so no request is sent
+const useDashboard = ({ includeEmployees = true } = {}) => {
     const [stats, setStats] = useState(null)
     const [topCompanies, setTopCompanies] = useState([])
     const [recentEmployees, setRecentEmployees] = useState([])
@@ -63,7 +64,7 @@ const useDashboard = () => {
             const [statsResult, companiesResult, employeesResult] = await Promise.allSettled([
                 FetchData(`${API_URL}/dashboard`),
                 fetchTopCompanies(),
-                fetchRecentEmployees(),
+                includeEmployees ? fetchRecentEmployees() : Promise.resolve([]),
             ])
             if (ignore) return
 
@@ -89,7 +90,7 @@ const useDashboard = () => {
         return () => {
             ignore = true
         }
-    }, [refreshKey])
+    }, [refreshKey, includeEmployees])
 
     return { stats, topCompanies, recentEmployees, sectionErrors, isLoading, isRefreshing, error, lastUpdated, refresh }
 }

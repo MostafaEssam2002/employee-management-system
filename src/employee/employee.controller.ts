@@ -16,41 +16,45 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
+  @Roles('Admin', 'Manager')
   @Post()
   @ApiOperation({
     summary: 'Create an employee',
     description:
-      'Creates an employee record. The department must belong to the specified company, and hiredOn is required when the status is HIRED. Requires a JWT and the Admin role.',
+      'Creates an employee record. The department must belong to the specified company, and hiredOn is required when the status is HIRED. Requires a JWT and the Admin or Manager role.',
   })
   create(@Body() createEmployeeDto: CreateEmployeeDto) {
     return this.employeeService.create(createEmployeeDto);
   }
 
+  @Roles('Admin', 'Manager')
   @Get()
   @ApiOperation({
     summary: 'List employees',
     description:
-      'Returns employees with their department and company details, days employed, and pagination details. Returns 10 employees per page; use page to select a page number. Requires a JWT and the Admin role.',
+      'Returns employees with their department and company details, days employed, and pagination details. Returns 10 employees per page; use page to select a page number. Requires a JWT and the Admin or Manager role.',
   })
   findAll(@Query() paginationDto: PaginationDto) {
     return this.employeeService.findAll(Number(paginationDto.page));
   }
 
+  @Roles('Admin', 'Manager')
   @Get(':id')
   @ApiOperation({
     summary: 'Get an employee by ID',
     description:
-      'Returns the employee details with department and company information and days employed. Requires a JWT and the Admin role.',
+      'Returns the employee details with department and company information and days employed. Requires a JWT and the Admin or Manager role.',
   })
   findOne(@Param('id') id: string) {
     return this.employeeService.findOne(+id);
   }
 
+  @Roles('Admin', 'Manager')
   @Patch(':id')
   @ApiOperation({
     summary: 'Update an employee',
     description:
-      'Updates the specified employee. Validates that the department belongs to the company and that any employee status transition is allowed. Requires a JWT and the Admin role.',
+      'Updates the specified employee. Validates that the department belongs to the company and that any employee status transition is allowed. Requires a JWT and the Admin or Manager role.',
   })
   update(@Param('id') id: string, @Body() updateEmployeeDto: UpdateEmployeeDto) {
     return this.employeeService.update(+id, updateEmployeeDto);

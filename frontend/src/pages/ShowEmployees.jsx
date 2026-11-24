@@ -7,6 +7,7 @@ import {  SearchIcon } from '../assets/icons'
 import useTableData from '../hooks/useTableData'
 import DataTable from '../components/DataTable/DataTable'
 import DeleteData from '../utilis/DeleteData'
+import { ADMIN_ONLY, getRole, hasRole } from '../utilis/auth'
 import { useNavigate } from 'react-router-dom'
 const handleAdd = (row) => console.log('add', row)
 const columns = [
@@ -22,6 +23,7 @@ const columns = [
 ]
 const ShowEmployees = () => {
     const navigate = useNavigate()
+    const canDelete = hasRole(ADMIN_ONLY, getRole()) // Manager can create/edit but not delete
     const handleView = (row) =>navigate(`/employee/${row.id}`)
 
     const [currentPage, setCurrentPage] = useState(1)
@@ -87,7 +89,7 @@ const ShowEmployees = () => {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </label>
-                <DataTable columns={columns} data={filtered} deletingIds={deletingIds} emptyText="No employees found" onEdit={handleEdit} onView={handleView} onDelete={handleDelete} onAdd={handleAdd} />
+                <DataTable columns={columns} data={filtered} deletingIds={deletingIds} emptyText="No employees found" onEdit={handleEdit} onView={handleView} onDelete={canDelete ? handleDelete : undefined} onAdd={handleAdd} />
             </section>
             <Pagination
                 totalPages={totalPages}

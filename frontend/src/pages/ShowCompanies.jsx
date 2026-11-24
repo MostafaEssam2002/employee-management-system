@@ -7,6 +7,7 @@ import {   SearchIcon } from '../assets/icons'
 import useTableData from '../hooks/useTableData'
 import DataTable from '../components/DataTable/DataTable'
 import DeleteData from '../utilis/DeleteData'
+import { ADMIN_ONLY, getRole, hasRole } from '../utilis/auth'
 import { useNavigate } from 'react-router-dom'
 
 const columns = [
@@ -17,6 +18,7 @@ const columns = [
 ]
 const ShowCompanies = () => {
     const navigate = useNavigate();
+    const canWrite = hasRole(ADMIN_ONLY, getRole()) // companies are read-only for Manager
     const handleView = (row) =>navigate(`/company/${row.id}`)
     const handleEdit = (row) => navigate(`/update/company/${row.id}`)
 
@@ -67,9 +69,11 @@ const ShowCompanies = () => {
                         View and manage all companies{companyName && ` for ${companyName}`}.
                     </p>
                 </div>
-                <button type="button" onClick={()=>navigate("/add-company")} className="departments__create">
-                    Create New Company
-                </button>
+                {canWrite && (
+                    <button type="button" onClick={()=>navigate("/add-company")} className="departments__create">
+                        Create New Company
+                    </button>
+                )}
             </header>
 
             <section className="departments__card">
@@ -77,7 +81,7 @@ const ShowCompanies = () => {
                     <SearchIcon />
                     <input type="search" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)}/>
                 </label>
-            <DataTable columns={columns} data={filtered} deletingIds={deletingIds} emptyText="No departments found" onEdit={handleEdit} onView={handleView} onDelete={handleDelete}  />
+            <DataTable columns={columns} data={filtered} deletingIds={deletingIds} emptyText="No departments found" onEdit={canWrite ? handleEdit : undefined} onView={handleView} onDelete={canWrite ? handleDelete : undefined}  />
             </section>
             <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={setCurrentPage}/>
             <div className="departments__watermark" aria-hidden="true">

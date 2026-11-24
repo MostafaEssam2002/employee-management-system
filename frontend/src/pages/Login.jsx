@@ -1,11 +1,12 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Button from "../components/Button"
 import Input from "../components/Input"
 import Form from './../components/Form';
 import BrainWiseLogo from "../assets/BrainWiseLogo"
 import LoginIllustration from "../assets/LoginIllustration"
 import "./Login.css"
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { SESSION_EXPIRED_MESSAGE, clearSession, saveSession } from "../utilis/session";
 
 const EyeOffIcon = () => (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -25,7 +26,14 @@ const EyeIcon = () => (
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate();
-    const [error, setError] = useState("");
+    const [searchParams] = useSearchParams();
+    const expired = searchParams.get("reason") === "expired";
+    const [error, setError] = useState(expired ? SESSION_EXPIRED_MESSAGE : "");
+
+    // arriving here after an expiry: make sure no stale session is left behind
+    useEffect(() => {
+        if (expired) clearSession();
+    }, [expired]);
     return (
         <div className="login-page">
             <div className="login-bg-mark" aria-hidden="true" />
@@ -43,7 +51,7 @@ const Login = () => {
                 <h1 className="login-title">Employee Login</h1>
 
                 <Form action="http://localhost:3000/auth/login" method="post" onSuccess={(res) => {
-            localStorage.setItem("user", JSON.stringify(res.data));
+            saveSession(res.data);
             navigate("/dashboard");
         }}
         onError={setError}>

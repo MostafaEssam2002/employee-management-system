@@ -1,3 +1,5 @@
+import { assertAuthorized } from './session'
+
 // Sends the form as JSON. Resolves with the parsed response,
 // throws an Error (with a readable message) when the request fails.
 async function UpdateData(event, url) {
@@ -28,6 +30,7 @@ async function UpdateData(event, url) {
             credentials: "include",
             body: JSON.stringify(data),
         })
+        assertAuthorized(response, url)
 
         // the body may be empty / not JSON on some errors
         const result = await response.json().catch(() => ({}))

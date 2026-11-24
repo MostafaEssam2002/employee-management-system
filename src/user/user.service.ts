@@ -1,4 +1,4 @@
-import {  ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from "bcrypt"
@@ -71,13 +71,23 @@ export class UserService {
     };
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  // currentUserId = the admin making the request (from the JWT); used for the self-protection rules
+  async update(id: number, updateUserDto: UpdateUserDto, currentUserId?: number) {
     this.logger.log(`Fetching user with ID: ${id}`);
     const data = { ...updateUserDto }
     const user = await this.prisma.user.findUnique({where:{id:id}})
     if(!user){
       this.logger.warn(`user with ${id} not found`);
       throw new NotFoundException("User not found")
+    }
+    if (currentUserId === id && data.role && data.role !== user.role) {
+      throw new BadRequestException('You cannot change your own role');
+    }
+    if (data.email && data.email !== user.email) {
+      const emailTaken = await this.prisma.user.findUnique({ where: { email: data.email }, select: { id: true } });
+      if (emailTaken) {
+        throw new ConflictException('Email already exists');
+      }
     }
     if(data.password){
       const hashedPassword = await bcrypt.hash(data.password,10)
@@ -91,7 +101,10 @@ export class UserService {
     };
   }
 
-  async remove(id: number) {
+  async remove(id: number, currentUserId?: number) {
+    if (currentUserId === id) {
+      throw new BadRequestException('You cannot delete your own account');
+    }
     this.logger.log(`Fetching user with ID: ${id}`);
 
     const user = await this.prisma.user.findUnique({where:{id:id}})

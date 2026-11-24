@@ -8,6 +8,7 @@ import useTableData from '../hooks/useTableData'
 import DataTable from '../components/DataTable/DataTable'
 import DeleteData from '../utilis/DeleteData'
 import { useNavigate } from 'react-router-dom'
+import { ADMIN_AND_MANAGER, ADMIN_ONLY, getRole, hasRole } from '../utilis/auth'
 const handleAdd = (row) => console.log('add', row)
 const columns = [
     { key: 'name', label: 'Department Name', className: 'table__name' },
@@ -21,6 +22,9 @@ const columns = [
 ]
 const ShowDepartments = () => {
     const navigate= useNavigate();
+    const role = getRole()
+    const canManage = hasRole(ADMIN_AND_MANAGER, role) // Employee: list only
+    const canDelete = hasRole(ADMIN_ONLY, role)
     const [currentPage, setCurrentPage] = useState(1)
     const [search, setSearch] = useState('')
     const [deletingIds, setDeletingIds] = useState(() => new Set())
@@ -66,16 +70,18 @@ const ShowDepartments = () => {
                         View and manage all departments{companyName && ` for ${companyName}`}.
                     </p>
                 </div>
-                <button type="button" className="departments__create" onClick={()=>{navigate("/add-department")}}>
-                    Create New Department
-                </button>
+                {canManage && (
+                    <button type="button" className="departments__create" onClick={()=>{navigate("/add-department")}}>
+                        Create New Department
+                    </button>
+                )}
             </header>
             <section className="departments__card">
                 <label className="departments__search">
                     <SearchIcon />
                     <input type="search" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)}/>
                 </label>
-                <DataTable columns={columns} data={filtered} deletingIds={deletingIds} emptyText="No departments found" onEdit={handleEdit} onView={handleView} onDelete={handleDelete} onAdd={handleAdd}/>
+                <DataTable columns={columns} data={filtered} deletingIds={deletingIds} emptyText="No departments found" onEdit={canManage ? handleEdit : undefined} onView={canManage ? handleView : undefined} onDelete={canDelete ? handleDelete : undefined} onAdd={canManage ? handleAdd : undefined}/>
             </section>
             <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={setCurrentPage}/>
             <div className="departments__watermark" aria-hidden="true">

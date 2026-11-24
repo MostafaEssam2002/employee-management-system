@@ -16,7 +16,7 @@ export class CreateEmployeeDto {
     @ApiProperty({ example: '+12025550123' })
     @IsString()
     @IsNotEmpty()
-    @IsPhoneNumber()
+    @IsPhoneNumber('EG')
     mobile: string;
 
     @ApiProperty({ example: '123 Main Street' })

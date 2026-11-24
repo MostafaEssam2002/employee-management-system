@@ -6,6 +6,7 @@ import Toast from '../components/Toast/Toast'
 import DonutChart from '../components/DonutChart/DonutChart'
 import useDashboard from '../hooks/useDashboard'
 import DeleteData from '../utilis/DeleteData'
+import { ADMIN_AND_MANAGER, ADMIN_ONLY, getUser, hasRole } from '../utilis/auth'
 import {
     ArrowDownIcon,
     ArrowRightIcon,
@@ -29,14 +30,6 @@ import {
 
 const API_URL = 'http://localhost:3000'
 const COMPANY_COLORS = ['#2f6df6', '#6d4de0', '#19b37a']
-
-const getUser = () => {
-    try {
-        return JSON.parse(localStorage.getItem('user'))
-    } catch {
-        return null
-    }
-}
 
 const getInitials = (name = '') =>
     name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('') || 'U'
@@ -67,10 +60,13 @@ const Growth = ({ difference }) => {
 const Dashboard = () => {
     const navigate = useNavigate()
     const user = getUser()
-    const isAdmin = user?.role === 'Admin'
+    const isAdmin = hasRole(ADMIN_ONLY, user?.role)
+    // Manager + Admin can open/edit employees; only Admin can delete. Employee sees no employee data.
+    const canViewEmployees = hasRole(ADMIN_AND_MANAGER, user?.role)
+    const showActions = canViewEmployees
 
     const { stats, topCompanies, recentEmployees, sectionErrors, isLoading, isRefreshing, error, lastUpdated, refresh } =
-        useDashboard()
+        useDashboard({ includeEmployees: canViewEmployees })
 
     const [search, setSearch] = useState('')
     const [hiddenSegments, setHiddenSegments] = useState([])
@@ -151,7 +147,7 @@ const Dashboard = () => {
                         className="dashboard__bell"
                         aria-label={`${stats.numberOfApplicationRecievedEmployees} applications waiting for review`}
                         title="Applications waiting for review"
-                        onClick={() => navigate('/employees')}
+                        onClick={canViewEmployees ? () => navigate('/employees') : undefined}
                     >
                         <BellIcon />
                         {stats.numberOfApplicationRecievedEmployees > 0 && (
@@ -265,6 +261,7 @@ const Dashboard = () => {
                     </article>
                 </section>
 
+                {canViewEmployees && (
                 <section className="panel panel--table">
                     <div className="panel__head">
                         <h2 className="panel__title"><EmployeesIcon /> Recent Employees</h2>
@@ -289,13 +286,13 @@ const Dashboard = () => {
                                         <th>Days Employed</th>
                                         <th>Company</th>
                                         <th>Department</th>
-                                        {isAdmin && <th>Actions</th>}
+                                        {showActions && <th>Actions</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {visibleEmployees.length === 0 ? (
                                         <tr>
-                                            <td colSpan={isAdmin ? 10 : 9} className="recent__empty">No employees found</td>
+                                            <td colSpan={showActions ? 10 : 9} className="recent__empty">No employees found</td>
                                         </tr>
                                     ) : (
                                         visibleEmployees.map((employee, index) => (
@@ -309,12 +306,12 @@ const Dashboard = () => {
                                                 <td>{formatDays(employee.daysEmployed)}</td>
                                                 <td><div className="recent__cut" title={employee.department?.company?.name}>{employee.department?.company?.name}</div></td>
                                                 <td><div className="recent__cut" title={employee.department?.name}>{employee.department?.name}</div></td>
-                                                {isAdmin && (
+                                                {showActions && (
                                                     <td>
                                                         <div className="recent__actions">
                                                             <button type="button" className="recent__btn recent__btn--view" aria-label="View" onClick={() => navigate(`/employee/${employee.id}`)}><EyeIcon /></button>
                                                             <button type="button" className="recent__btn recent__btn--edit" aria-label="Edit" onClick={() => navigate(`/update/employee/${employee.id}`)}><EditIcon /></button>
-                                                            <button type="button" className="recent__btn recent__btn--delete" aria-label="Delete" onClick={() => handleDelete(employee)}><TrashIcon /></button>
+                                                            {isAdmin && <button type="button" className="recent__btn recent__btn--delete" aria-label="Delete" onClick={() => handleDelete(employee)}><TrashIcon /></button>}
                                                         </div>
                                                     </td>
                                                 )}
@@ -326,6 +323,7 @@ const Dashboard = () => {
                         </div>
                     )}
                 </section>
+                )}
             </div>
         </main>
     )

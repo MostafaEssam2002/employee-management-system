@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, ParseIntPipe, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -43,27 +43,27 @@ export class UserController {
     description:
       'Returns the specified user details without the password. Requires a JWT and the Admin role.',
   })
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({
     summary: 'Update a user',
     description:
-      'Updates the specified user. If a new password is supplied, it is hashed before storage. Requires a JWT and the Admin role.',
+      'Updates the specified user. If a new password is supplied, it is hashed before storage. An email already used by another user is rejected, and an admin cannot change their own role. Requires a JWT and the Admin role.',
   })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto, @Req() req: { user: { sub: number } }) {
+    return this.userService.update(id, updateUserDto, req.user.sub);
   }
 
   @Delete(':id')
   @ApiOperation({
     summary: 'Delete a user',
     description:
-      'Deletes the specified user and returns its details without the password. Requires a JWT and the Admin role.',
+      'Deletes the specified user and returns its details without the password. An admin cannot delete their own account. Requires a JWT and the Admin role.',
   })
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number, @Req() req: { user: { sub: number } }) {
+    return this.userService.remove(id, req.user.sub);
   }
 }

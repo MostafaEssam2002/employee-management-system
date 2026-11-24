@@ -26,6 +26,8 @@ describe('AuthController', () => {
   });
 
   // ------------------------------------------------------------ delegation
+  const responseMock = { cookie: jest.fn(), clearCookie: jest.fn() } as any;
+
   describe('delegation to AuthService', () => {
     it('login() passes the body to the service and returns its result', async () => {
       const dto = { email: 'alex@example.com', password: 'password123' };
@@ -36,14 +38,18 @@ describe('AuthController', () => {
       };
       serviceMock.login.mockResolvedValue(expected);
 
-      await expect(controller.login(dto)).resolves.toBe(expected);
+      await expect(controller.login(dto, responseMock)).resolves.toEqual({
+        message: expected.message,
+        data: { ...expected.data, expiresAt: expect.any(Number) },
+      });
+      expect(responseMock.cookie).toHaveBeenCalledWith('token', 'jwt-token', expect.any(Object));
       expect(serviceMock.login).toHaveBeenCalledWith(dto);
     });
 
     it('login() does not call register()', async () => {
-      serviceMock.login.mockResolvedValue({});
+      serviceMock.login.mockResolvedValue({ message: 'ok', data: {}, token: 't' });
 
-      await controller.login({ email: 'alex@example.com', password: 'password123' });
+      await controller.login({ email: 'alex@example.com', password: 'password123' }, responseMock);
 
       expect(serviceMock.register).not.toHaveBeenCalled();
     });
@@ -53,7 +59,7 @@ describe('AuthController', () => {
       serviceMock.login.mockRejectedValue(error);
 
       await expect(
-        controller.login({ email: 'alex@example.com', password: 'wrong-password' }),
+        controller.login({ email: 'alex@example.com', password: 'wrong-password' }, responseMock),
       ).rejects.toBe(error);
     });
 

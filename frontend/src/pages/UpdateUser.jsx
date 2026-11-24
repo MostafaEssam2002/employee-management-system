@@ -4,7 +4,8 @@ import Input from "../components/Input"
 import Button from "../components/Button"
 import Toast from "../components/Toast/Toast"
 import BrainWiseLogo from "../assets/BrainWiseLogo"
-import { UserIcon, MailIcon, BadgeIcon, SettingsIcon, EmployeesIcon } from "../assets/icons"
+import { UserIcon, MailIcon, BadgeIcon, SettingsIcon, EmployeesIcon, LockIcon } from "../assets/icons"
+import { Link, useParams } from "react-router-dom"
 import FetchData from "../utilis/FetchData"
 import "./CreateCompany.scss"
 
@@ -32,6 +33,15 @@ const FIELDS = [
         autoComplete: "email",
     },
     {
+        name: "password",
+        label: "New Password",
+        type: "password",
+        placeholder: "Leave empty to keep the current password",
+        Icon: LockIcon,
+        minLength: 8,
+        autoComplete: "new-password",
+    },
+    {
         name: "role",
         label: "Role",
         type: "choice",
@@ -48,20 +58,20 @@ const FIELDS = [
 const EMPTY_VALUES = Object.fromEntries(FIELDS.map((f) => [f.name, ""]))
 
 const UpdateUser = () => {
-    const [id, setId] = useState("")
+    const { id } = useParams() // the user being edited comes from the URL (/update/user/:id)
+    const [reloadKey, setReloadKey] = useState(0) // bump to re-load the user after a save
     const [values, setValues] = useState(EMPTY_VALUES)
     const [currentRole, setCurrentRole] = useState("") // the role the user has now (its card is disabled)
-    const [errors, setErrors] = useState({}) // { id, name, email, ... }
+    const [errors, setErrors] = useState({}) // { name, email, ... }
+    const [loadFailed, setLoadFailed] = useState(false) // the id in the URL doesn't match a user
     const [toast, setToast] = useState(null) // { type: 'error' | 'success', message }
 
     const closeToast = useCallback(() => setToast(null), [])
 
     const handleSuccess = (result) => {
         setToast({ type: "success", message: result.message || "User updated successfully" })
-        setId("")
-        setValues(EMPTY_VALUES)
-        setCurrentRole("")
         setErrors({})
+        setReloadKey((key) => key + 1) // show the saved values (and the new "current" role)
     }
 
     const handleError = (message) => {
@@ -76,20 +86,16 @@ const UpdateUser = () => {
         const showToast = (message) => {
             if (e.target.form?.querySelector(":invalid") === e.target) setToast({ type: "error", message })
         }
-        const { valueMissing, typeMismatch, patternMismatch, rangeUnderflow } = e.target.validity
+        const { valueMissing, typeMismatch, patternMismatch, rangeUnderflow, tooShort } = e.target.validity
         let message
         if (valueMissing) message = field.name === "id" ? `${field.label} is required` : AT_LEAST_ONE
         else if (typeMismatch) message = `Enter a valid ${field.label.toLowerCase()}`
         else if (patternMismatch) message = field.patternMessage
+        else if (tooShort) message = `${field.label} must be at least ${field.minLength} characters`
         else if (rangeUnderflow) message = `${field.label} must be greater than 0`
         else message = `${field.label} must be a positive whole number`
         setErrors((prev) => ({ ...prev, [field.name]: message })) // red border only
         showToast(message)
-    }
-
-    const handleChangeId = (e) => {
-        setId(e.target.value)
-        setErrors((prev) => ({ ...prev, id: "" }))
     }
 
     // the editable fields depend on each other ("at least one"), so clear all their errors
@@ -98,9 +104,9 @@ const UpdateUser = () => {
         setErrors((prev) => ({ id: prev.id }))
     }
 
-    // load the user's current values once a valid ID is entered
+    // load the user's current values
     useEffect(() => {
-        if (!id || Number(id) < 1) {
+        if (!id || !/^[1-9]\d*$/.test(id)) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setValues(EMPTY_VALUES)
             setCurrentRole("")
@@ -113,6 +119,7 @@ const UpdateUser = () => {
             .then((res) => {
                 if (cancelled) return
                 const user = res.data
+                setLoadFailed(false)
                 // role starts empty: the user picks a NEW role, the current one is shown disabled
                 setValues(
                     Object.fromEntries(
@@ -125,13 +132,13 @@ const UpdateUser = () => {
                 if (cancelled) return
                 setValues(EMPTY_VALUES)
                 setCurrentRole("")
-                setErrors((prev) => ({ ...prev, id: "User not found" })) // red border only
+                setLoadFailed(true)
                 setToast({ type: "error", message: "User not found" })
             })
 
         // ignore stale responses when the ID changes quickly
         return () => { cancelled = true }
-    }, [id])
+    }, [id, reloadKey])
 
     // a field is only required while every other editable field is empty
     const isRequired = (name) =>
@@ -145,42 +152,27 @@ const UpdateUser = () => {
                 <header className="form-page__header">
                     <h1 className="form-page__title">Update User</h1>
                     <p className="form-page__subtitle">
-                        Enter the user ID, then change any of the details below.
+                        Editing user #{id}. Change any of the details below; leave a field as is to keep it.
                     </p>
                 </header>
 
                 <UpdateForm
                     action={`${API_URL}/${id}`}
-                    method="put"
+                    method="patch"
                     onSuccess={handleSuccess}
                     onError={handleError}
                 >
                     <section className="form-page__card">
                         <h2 className="form-page__section">User Details</h2>
 
-                        <div className="form-field">
-                            <label htmlFor="userId">User ID</label>
-                            <div className="form-field__control">
-                                <span className="form-field__icon"><UserIcon /></span>
-                                {/* no "name": the ID goes in the URL, not in the request body */}
-                                <Input
-                                    type="number"
-                                    id="userId"
-                                    placeHolder="Enter user ID"
-                                    className={`form-input${errors.id ? " form-input--error" : ""}`}
-                                    value={id}
-                                    onChange={handleChangeId}
-                                    onInvalid={handleInvalid({ name: "id", label: "User ID" })}
-                                    required
-                                    min="1"
-                                    step="1"
-                                    aria-invalid={errors.id ? "true" : undefined}
-                                />
-                            </div>
-                        </div>
+                        {loadFailed && (
+                            <p className="form-field__error" role="alert">
+                                User #{id} was not found. <Link to="/users">Back to users</Link>
+                            </p>
+                        )}
 
                         {FIELDS.map((field) => {
-                            const { name, label, type, placeholder, Icon, pattern, min, step, autoComplete } = field
+                            const { name, label, type, placeholder, Icon, pattern, min, step, minLength, autoComplete } = field
                             const fieldId = `user-${name}`
                             const error = errors[name]
 
@@ -228,6 +220,7 @@ const UpdateUser = () => {
                                             pattern={pattern}
                                             min={min}
                                             step={step}
+                                            minLength={minLength}
                                             autoComplete={autoComplete}
                                             aria-invalid={error ? "true" : undefined}
                                         />
@@ -245,7 +238,7 @@ const UpdateUser = () => {
                             className="form-btn form-btn--primary"
                             text="Update User"
                         />
-                        <a href="#/users" className="form-btn form-btn--secondary">Cancel</a>
+                        <Link to="/users" className="form-btn form-btn--secondary">Cancel</Link>
                     </div>
                 </UpdateForm>
             </div>

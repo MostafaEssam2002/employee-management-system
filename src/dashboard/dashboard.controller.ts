@@ -7,7 +7,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('dashboard')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('Admin')
+@Roles('Admin', 'Manager', 'Employee')
 @ApiTags('Companies')
 @ApiBearerAuth('JWT-auth')
 export class DashboardController {

@@ -1,0 +1,33 @@
+.user-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+
+    &__btn {
+        padding: 10px 20px;
+        font: inherit;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: background 0.2s ease, opacity 0.2s ease;
+
+        &--primary {
+            color: #fff;
+            background: #134e4a;
+            &:hover { background: #0f3f3c; }
+        }
+
+        &--danger {
+            color: #991b1b;
+            background: #fff;
+            border-color: #f1b8b8;
+            &:hover:not(:disabled) { background: #fdecec; }
+        }
+
+        &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+}
